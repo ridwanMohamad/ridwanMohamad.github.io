@@ -1,0 +1,716 @@
+var baseUrl= $("meta[name='base_url']").attr("content");
+var lang = "en";
+lang = localStorage.getItem("lang");
+
+function signOut() {
+	var loginType = localStorage.getItem('loginType');
+
+	if (loginType === 'fb') {
+		// var accessToken = localStorage.getItem('accessToken');
+		blockLoad();
+		FB.getLoginStatus(function (response) {
+			if (response && response.status === 'connected') {
+				FB.logout(function(response) {
+					// user is now logged out
+					//console.log(response);
+					unblockLoad();
+
+					//showAlert('success', 'Logout Success', '');
+					localStorage.setItem('userToken', '');
+					localStorage.setItem('userId', '');
+					localStorage.setItem('userName', '');
+					if (lang == 'id') {
+						showAlertHTMLRedirect(
+							'success',
+							'Logout Berhasil',
+							'',
+							baseUrl
+						);
+					} else {
+						showAlertHTMLRedirect(
+							'success',
+							'Logout Success',
+							'',
+							baseUrl
+						);
+					}
+				});
+				
+				//location.reload();
+			  }
+		});
+	}
+
+	if (loginType === 'google') {
+		var auth2 = gapi.auth2.getAuthInstance();
+		blockLoad();
+		auth2.signOut().then(function () {
+			unblockLoad();
+
+			//showAlert('success', 'Logout Success', '');
+			// console.log('User signed out.');
+			localStorage.setItem('userToken', '');
+			localStorage.setItem('userId', '');
+			localStorage.setItem('userName', '');
+			showAlertHTMLRedirect(
+				'success',
+				'Logout Success',
+				'',
+				baseUrl
+			);
+		});
+		// localStorage.setItem('userToken', '');
+		// localStorage.setItem('userId', '');
+		// localStorage.setItem('userName', '');
+		// location.reload();
+	}
+
+	if (loginType === 'normal') {
+		blockLoad();
+		
+		unblockLoad();
+
+		// showAlert('success', 'Logout Success', '');
+		localStorage.setItem('userToken', '');
+		localStorage.setItem('userId', '');
+		localStorage.setItem('userName', '');
+		showAlertHTMLRedirect(
+			'success',
+			'Logout Success',
+			'',
+			baseUrl
+		);
+			
+	}
+}
+
+function onLoadGoogleCallback() {
+	gapi.load('auth2', function () {
+		auth2 = gapi.auth2.init({
+			client_id:
+				'847128158254-8auplhtrc5dnpb9nsl1845nc8gsd3jj8.apps.googleusercontent.com',
+		});
+
+		auth2.attachClickHandler(
+			element,
+			{},
+			function (googleUser) {
+				var ts = getTimeStamp();
+				var gName = googleUser.getBasicProfile().getName();
+				var gEmail = googleUser.getBasicProfile().getEmail();
+				//console.log('Signed in: ' + gName + ' - ' +gEmail);
+				$.ajax({
+					type: 'post',
+					url: URL + merchantSocialLogin,
+					headers: {
+						apiKey: apiKey,
+					},
+					data: {
+						language: lang,
+						timeStamp: getTimeStamp(),
+						apiToken: genToken(ts),
+						sender: 'app',
+						fullName: gName,
+						email: gEmail,
+					},
+					dataType: 'json',
+					success: function (response) {
+						//console.log(response);
+						if (response.responseCode === '000') {
+							var userData = response.response.userData;
+							localStorage.setItem(
+								'userToken',
+								response.response.loginToken
+							);
+							localStorage.setItem('userId', userData.id);
+							localStorage.setItem('userName', userData.name);
+							$('#modalLogin').modal('hide');
+							if (response.response.isNew === '1') {
+								$('#modalCR').modal('show');
+							} else {
+								localStorage.setItem(
+									'userToken',
+									response.response.loginToken
+								);
+								localStorage.setItem('userId', userData.id);
+								localStorage.setItem('userName', userData.name);
+								localStorage.setItem('loginType', 'google');
+								location.reload();
+								// console.log(response.response.loginToken)
+								// console.log(userData.id)
+								// console.log(userData.name)
+								console.log(
+									'Sukses Social Login, need action for session login'
+								);
+							}
+						}
+					},
+				});
+			},
+			function (error) {
+				console.log('Sign-in error', error);
+			}
+		);
+	});
+
+	element = document.getElementById('ccccc');
+}
+
+$(function () {
+	'use strict';
+
+	var before = document.getElementById('before-login');
+	var after = document.getElementById('after-login');
+	var userToken = localStorage.getItem('userToken') ?? '';
+
+	if (userToken != '') {
+		var aname = document.getElementById('aName');
+		var userName = localStorage.getItem('userName');
+		aname.innerHTML = `Hello <strong>${userName}</strong>`;
+		before.style.display = 'none';
+		after.style.display = 'list-item';
+		$('#before-login').addClass('d-none');
+		$('#after-login').removeClass('d-none');
+	} else {
+		$('#after-login').addClass('d-none');
+		$('#before-login').removeClass('d-none');
+	}
+
+	window.addEventListener(
+		'load',
+		function () {
+			// Fetch all the forms we want to apply custom Bootstrap validation styles to
+			var loginForms =
+				document.getElementsByClassName('login-validation');
+			var completeRegisForms =
+				document.getElementsByClassName('cr-validation');
+			var registerForms =
+				document.getElementsByClassName('regis-validation');
+			var forgetForms =
+				document.getElementsByClassName('forget-validation');
+			// Loop over them and prevent submission
+			// var loginValidation = Array.prototype.filter.call(
+			// 	loginForms,
+			// 	function (form) {
+			// 		form.addEventListener(
+			// 			'submit',
+			// 			function (event) {
+			// 				if (form.checkValidity() === false) {
+			// 					event.preventDefault();
+			// 					event.stopPropagation();
+			// 					// console.log('aman');
+			// 				} else {
+			// 					event.preventDefault();
+			// 					event.stopPropagation();
+			// 					var ts = getTimeStamp();
+			// 					var emailLogin =
+			// 						document.getElementById('emailLogin').value;
+			// 					var upass =
+			// 						document.getElementById('upass').value;
+			// 					//console.log("next" + emailLogin + upass)
+			// 					blockLoad();
+			// 					$.ajax({
+			// 						type: 'post',
+			// 						url: URL + merchantLogin,
+			// 						headers: {
+			// 							apiKey: apiKey,
+			// 						},
+			// 						data: {
+			// 							language: lang,
+			// 							timeStamp: getTimeStamp(),
+			// 							apiToken: genToken(ts),
+			// 							sender: 'app',
+			// 							email: emailLogin,
+			// 							password: md5(upass),
+			// 						},
+			// 						dataType: 'json',
+			// 						success: function (response) {
+			// 							// console.log(response);
+			// 							if (
+			// 								response.responseCode === '000' &&
+			// 								response.responseMessage ===
+			// 									'Success'
+			// 							) {
+			// 								$('#modalLogin').modal('hide');
+			// 								var userData =
+			// 									response.response.userData;
+			// 								localStorage.setItem(
+			// 									'userToken',
+			// 									response.response.loginToken
+			// 								);
+			// 								localStorage.setItem(
+			// 									'userId',
+			// 									userData.id
+			// 								);
+			// 								localStorage.setItem(
+			// 									'userName',
+			// 									userData.name
+			// 								);
+			// 								localStorage.setItem('loginType', 'normal');
+			// 								location.reload();
+			// 								// console.log(response.response.loginToken)
+			// 								// console.log(userData.id)
+			// 								// console.log(userData.name)
+			// 								// console.log('Sukses Login, need action for session login')
+			// 							} else {
+			// 								$('#modalLogin').modal('hide');
+			// 								showAlert(
+			// 									'error',
+			// 									'Opss',
+			// 									response.responseMessage,
+			// 									''
+			// 								);
+			// 							}
+			// 						},
+			// 					});
+			// 				}
+			// 			},
+			// 			false
+			// 		);
+			// 	}
+			// );
+
+			var crValidation = Array.prototype.filter.call(
+				completeRegisForms,
+				function (form) {
+					form.addEventListener(
+						'submit',
+						function (event) {
+							if (form.checkValidity() === false) {
+								event.preventDefault();
+								event.stopPropagation();
+								console.log('aman');
+							} else {
+								event.preventDefault();
+								event.stopPropagation();
+								var ts = getTimeStamp();
+								var userId = localStorage.getItem('userId');
+								var userName = localStorage.getItem('userName');
+								var crPhoneNumber =
+									document.getElementById(
+										'crPhoneNumber'
+									).value;
+								var crUpass =
+									document.getElementById('crUpass').value;
+								//console.log("crValidationData:" + crPhoneNumber + crUpass)
+								$.ajax({
+									type: 'post',
+									url: URL + merchantUpdateProfile,
+									headers: {
+										apiKey: apiKey,
+									},
+									data: {
+										language: lang,
+										timeStamp: getTimeStamp(),
+										apiToken: genToken(ts),
+										sender: 'app',
+										usersId: userId,
+										fullName: userName,
+										phoneNumber: crPhoneNumber,
+										newPassword: md5(crUpass),
+									},
+									dataType: 'json',
+									success: function (response) {
+										//console.log(response)
+										if (response.responseCode === '000') {
+											$('#modalCR').modal('hide');
+
+											console.log(
+												'Sukses Complete Register, need action for session login'
+											);
+										} else {
+											$('#modalCR').modal('hide');
+											showAlert(
+												'error',
+												'Opss',
+												response.responseMessage,
+												''
+											);
+										}
+									},
+								});
+							}
+						},
+						false
+					);
+				}
+			);
+
+			var rValidation = Array.prototype.filter.call(
+				registerForms,
+				function (form) {
+					form.addEventListener(
+						'submit',
+						function (event) {
+							if (form.checkValidity() === false) {
+								event.preventDefault();
+								event.stopPropagation();
+								console.log('aman');
+							} else {
+								event.preventDefault();
+								event.stopPropagation();
+								var ts = getTimeStamp();
+								var rFirstName =
+									document.getElementById('rFirstName').value;
+								var rLastName =
+									document.getElementById('rLastName').value;
+								var rEmail =
+									document.getElementById('rEmail').value;
+								var rPhone =
+									document.getElementById('rPhone').value;
+								var rUpass =
+									document.getElementById('rUpass').value;
+								var rCpass =
+									document.getElementById('rCpass').value;
+								//console.log("regis:" + rFirstName + rLastName + rEmail + rUpass + rCpass)
+								if (rUpass === rCpass) {
+									$.ajax({
+										type: 'post',
+										url: URL + merchantRegister,
+										headers: {
+											apiKey: apiKey,
+										},
+										data: {
+											language: lang,
+											timeStamp: getTimeStamp(),
+											apiToken: genToken(ts),
+											sender: 'app',
+											fullName:
+												rFirstName + ' ' + rLastName,
+											email: rEmail,
+											phoneNumber: rPhone,
+											password: md5(rUpass),
+										},
+										dataType: 'json',
+										success: function (response) {
+											//console.log(response)
+											if (response.responseCode === '000') {
+												$('#modalRegister').modal(
+													'hide'
+												);
+												$(
+													'#modalRegisterSuccess'
+												).modal('show');
+											} else {
+												$('#modalRegister').modal(
+													'hide'
+												);
+												showAlert(
+													'error',
+													'Opss',
+													response.responseMessage,
+													''
+												);
+											}
+										},
+									});
+								}
+							}
+						},
+						false
+					);
+				}
+			);
+
+			var fValidation = Array.prototype.filter.call(
+				forgetForms,
+				function (form) {
+					form.addEventListener(
+						'submit',
+						function (event) {
+							if (form.checkValidity() === false) {
+								event.preventDefault();
+								event.stopPropagation();
+								console.log('aman');
+							} else {
+								event.preventDefault();
+								event.stopPropagation();
+								var ts = getTimeStamp();
+								var fEmail =
+									document.getElementById('fEmail').value;
+								//console.log("regis:" + rFirstName + rLastName + rEmail + rUpass + rCpass)
+								$.ajax({
+									type: 'post',
+									url: URL + merchantForgotPassword,
+									headers: {
+										apiKey: apiKey,
+									},
+									data: {
+										language: lang,
+										timeStamp: getTimeStamp(),
+										apiToken: genToken(ts),
+										sender: 'app',
+										email: fEmail,
+									},
+									dataType: 'json',
+									success: function (response) {
+										//console.log(response)
+										if (response.responseCode === '000') {
+											$('#modalForget').modal('hide');
+											$('#modalForgetSuccess').modal(
+												'show'
+											);
+										} else {
+											$('#modalForget').modal('hide');
+											showAlert(
+												'error',
+												'Opss',
+												response.responseMessage,
+												''
+											);
+										}
+									},
+								});
+							}
+						},
+						false
+					);
+				}
+			);
+		},
+		false
+	);
+});
+
+function showRegis() {
+	$('#modalLogin').modal('hide');
+	$('#modalRegister').modal('show');
+}
+
+function showLogin() {
+	$('#modalForgetSuccess').modal('hide');
+	$('#modalRegisterSuccess').modal('hide');
+	$('#modalRegister').modal('hide');
+	$('#modalForget').modal('hide');
+	$('#modalLogin').modal('show');
+}
+
+function showForget() {
+	$('#modalLogin').modal('hide');
+	$('#modalForget').modal('show');
+}
+
+function statusChangeCallback(response) {
+	// Called with the results from FB.getLoginStatus().
+	//console.log('statusChangeCallback');
+	//console.log(response); // The current login status of the person.
+	localStorage.setItem('accessToken', response.authResponse.accessToken);
+
+	if (response.status === 'connected') {
+		// Logged into your webpage and Facebook.
+		//testAPI();
+		FB.api('/me', { locale: 'en_US', fields: 'name, email,birthday, hometown,education,gender,website,work' },
+          function(responsee) {
+            // console.log(responsee);
+            // console.log(responsee.name);
+			var ts = getTimeStamp();
+			var gName = responsee.name;
+			var gEmail = responsee.email;
+			//console.log('Signed in: ' + gName + ' - ' +gEmail);
+			$.ajax({
+				type: 'post',
+				url: URL + merchantSocialLogin,
+				headers: {
+					apiKey: apiKey,
+				},
+				data: {
+					language: lang,
+					timeStamp: getTimeStamp(),
+					apiToken: genToken(ts),
+					sender: 'app',
+					fullName: gName,
+					email: gEmail,
+				},
+				dataType: 'json',
+				success: function (response) {
+					//console.log(response);
+					if (response.responseCode === '000') {
+						var userData = response.response.userData;
+						localStorage.setItem(
+							'userToken',
+							response.response.loginToken
+						);
+						localStorage.setItem('userId', userData.id);
+						localStorage.setItem('userName', userData.name);
+						$('#modalLogin').modal('hide');
+						if (response.response.isNew === '1') {
+							$('#modalCR').modal('show');
+						} else {
+							localStorage.setItem(
+								'userToken',
+								response.response.loginToken
+							);
+							localStorage.setItem('userId', userData.id);
+							localStorage.setItem('userName', userData.name);
+							localStorage.setItem('loginType', 'fb');
+							
+							location.reload();
+							// console.log(response.response.loginToken)
+							// console.log(userData.id)
+							// console.log(userData.name)
+							console.log(
+								'Sukses Social Login, need action for session login'
+							);
+						}
+					}
+				},
+			});
+          }
+        );
+	} else {
+		// Not logged into your webpage or we are unable to tell.
+		// document.getElementById('status').innerHTML =
+		// 	'Please log ' + 'into this webpage.';
+	}
+}
+
+function checkLoginState() {
+	// Called when a person is finished with the Login Button.
+	FB.getLoginStatus(function (response) {
+		// See the onlogin handler
+		statusChangeCallback(response);
+	});
+}
+
+document.getElementById('fbButton').addEventListener('click', function() {
+    FB.login(statusChangeCallback, {scope: 'email,public_profile', return_scopes: true});
+}, false);
+
+function goManageBooking() {
+	var userToken = localStorage.getItem('userToken');
+	var form = document.createElement('form');
+	document.body.appendChild(form);
+	form.method = 'post';
+	form.action = `${WMS_URL}dashboard/booking`;
+	//for (var name in data) {
+	var input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = 'loginToken';
+	input.value = userToken;
+	form.appendChild(input);
+	//}
+	form.submit();
+	document.body.removeChild(form);
+}
+
+function goWallet() {
+	var userToken = localStorage.getItem('userToken');
+	var form = document.createElement('form');
+	document.body.appendChild(form);
+	form.method = 'post';
+	form.action = `${WMS_URL}dashboard/wallet-merchant`;
+	//for (var name in data) {
+	var input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = 'loginToken';
+	input.value = userToken;
+	form.appendChild(input);
+	//}
+	form.submit();
+	document.body.removeChild(form);
+}
+
+function goAccount() {
+	var userToken = localStorage.getItem('userToken');
+	var form = document.createElement('form');
+	document.body.appendChild(form);
+	form.method = 'post';
+	form.action = `${WMS_URL}dashboard/user/profile`;
+	//for (var name in data) {
+	var input = document.createElement('input');
+	input.type = 'hidden';
+	input.name = 'loginToken';
+	input.value = userToken;
+	form.appendChild(input);
+	//}
+	form.submit();
+	document.body.removeChild(form);
+}
+
+function newEmailLogin(){
+	var ts = getTimeStamp();
+	var emailLogin =
+		document.getElementById('emailLogin').value;
+	var upass =
+		document.getElementById('upass').value;
+	// console.log(emailLogin);
+	// console.log(upass)
+	if (emailLogin != '' && upass != '') {
+		if (vvalidateEmail(emailLogin)) {
+			blockLoad();
+			$.ajax({
+				type: 'post',
+				url: URL + merchantLogin,
+				headers: {
+					apiKey: apiKey,
+				},
+				data: {
+					language: lang,
+					timeStamp: getTimeStamp(),
+					apiToken: genToken(ts),
+					sender: 'app',
+					email: emailLogin,
+					password: md5(upass),
+				},
+				dataType: 'json',
+				success: function (response) {
+					// console.log(response);
+					if (response.responseCode === '000') {
+						$('#modalLogin').modal('hide');
+						var userData =
+							response.response.userData;
+						localStorage.setItem(
+							'userToken',
+							response.response.loginToken
+						);
+						localStorage.setItem(
+							'userId',
+							userData.id
+						);
+						localStorage.setItem(
+							'userName',
+							userData.name
+						);
+						localStorage.setItem('loginType', 'normal');
+						location.reload();
+						// console.log(response.response.loginToken)
+						// console.log(userData.id)
+						// console.log(userData.name)
+						// console.log('Sukses Login, need action for session login')
+					} else {
+						$('#modalLogin').modal('hide');
+						showAlert(
+							'error',
+							'Opss',
+							response.responseMessage,
+							''
+						);
+					}
+				},
+			});
+		} else {
+			if (lang == 'id') {
+				showAlert(
+					'error',
+					'Opss',
+					"Email tidak valid",
+					''
+				);
+			} else {
+				showAlert(
+					'error',
+					'Opss',
+					"Email is not valid",
+					''
+				);
+			}
+		}
+	}
+	
+}
+
+const vvalidateEmail = (email) => {
+	return email.match(
+	  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+	);
+  };

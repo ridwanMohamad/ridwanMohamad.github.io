@@ -1,0 +1,281 @@
+$(document).ready(function(){
+    //autoblock
+    if (ajaxAutoBlockUI === "1") {
+        //$(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+        //Auto block load when ajax start and stop
+        $(document).ajaxStart(function() {
+            blockLoad();
+        });
+        $(document).ajaxStop(function() {
+            unblockLoad();
+        });
+    }
+    //text
+    if (bodySmallText === "1") {
+        $('body').addClass('text-sm');
+    }
+    if (navbarSmallText === "1") {
+        $('.main-header').addClass('text-sm');
+    }
+    if (sidebarSmallText === "1") {
+        $('.nav-sidebar').addClass('text-sm');
+    }
+    if (footerSmallText === "1") {
+        $('.main-footer').addClass('text-sm');
+    }
+
+    //sidebar
+    if (sidebarNavFlatStyle === "1") {
+        $('.nav-sidebar').addClass('nav-flat');
+    }
+    if (sidebarNavLegacyStyle === "1") {
+        $('.nav-sidebar').addClass('nav-legacy');
+    }
+    if (sidebarNavCompact === "1") {
+        $('.nav-sidebar').addClass('nav-compact');
+    }
+    if (sidebarNavChildIndent === "1") {
+        $('.nav-sidebar').addClass('nav-child-indent');
+    }
+
+    var navbar_light_skins = [
+        'navbar-light',
+        'navbar-warning',
+        'navbar-white',
+        'navbar-orange',
+    ];
+    //color 
+    if (navbarColor !== "") {
+        $('.main-header').removeClass('navbar-white');
+        $('.main-header').removeClass('navbar-light');
+        if (navbar_light_skins.indexOf(sidebarNavChildIndent) > -1) {
+            $('.main-header').addClass('navbar-light');
+        } else {
+            $('.main-header').addClass('navbar-dark');
+        }
+        $('.main-header').addClass(navbarColor);
+    }
+    if (sidebarColor !== "") {
+        $('.main-sidebar').removeClass('sidebar-dark-primary');
+        $('.main-sidebar').addClass(sidebarColor);
+    }
+    if (brandLogoColor !== "") {
+        $('.brand-link').addClass(brandLogoColor);
+    }
+
+    var lang = localStorage.getItem("lang") ?? "en"; 
+    getLang();
+
+    // var exampleLang = {
+	// 	'id': {
+    //         "p-location" : "Lokasi",
+    //         "p-dates" : "Tanggal",
+    //         "navbar-bea": "Menjadi Mitra",
+    //         "navbar-manage": "Manage Booking",
+    //         "navbar-wallet": "Wallet",
+    //         "navbar-account": "Akun",
+    //         "footer-weare": "Kami adalah pasar gudang berdasarkan permintaan yang menghubungkan penawaran dan permintaan ruang gudang.",
+    //         "footer-about": "Tentang",
+    //         "footer-aboutcompany": "Tentang Perusahaan",
+    //         "footer-company": "Perusahaan",
+    //         "footer-partner": "Bermitra dengan kami",
+    //         "footer-account": "Akun",
+    //         "footer-contact": "Hubungi kami",
+    //         "footer-tou": "Syarat Penggunaan",
+    //         "footer-pp": "Kebijakan Privasi",
+    //         "footer-getin": "Get in Touch",
+    //         "footer-news": "Berita",
+    //         "home-expand": "Perluas Bisnis Anda Tanpa Investasi Modal Gudang",
+    //         "home-expand": "Perluas Bisnis Anda Tanpa Investasi Modal Gudang",
+    //         "home-capital": "Atau Kerumitan Manajemen Tenaga Kerja.",
+    //         "home-anytime": "Kapan Saja, Di Mana Saja, Jenis Apa Pun, Sesuai Kebutuhan",
+    //         "home-type" : "Ketik lokasi anda",
+    //         "home-add": "Tambah tanggal",
+    //         "home-explore": "JELAJAHI GUDANG KAMI",
+    //         "home-payforspace": "Bayar ruang sesuai kebutuhan, tanpa modal",
+    //         "home-hereare": "Berikut adalah poin utama gudang umum yang diselesaikan menggunakan Warespaze",
+    //         "home-inventory": "Fluktuasi Inventaris",
+    //         "home-weunderstand": "Kami memahami kebutuhan akan ruang ekstra selama musim penjualan puncak. Namun Anda hanya membutuhkan ruang selama beberapa minggu atau beberapa bulan. Mengapa menyewa sepanjang tahun jika Anda dapat membayar sesuai kebutuhan?",
+    //         "home-business": "Ekspansi bisnis",
+    //         "home-useyourcapital": "Gunakan modal Anda untuk meningkatkan pasar, bukan biaya tetap gudang. Gudang menjadi biaya variabel untuk Anda saat Anda berkembang.",
+    //         "home-entering": "Memasuki geografi baru",
+    //         "home-remove": "Hilangkan kerumitan dan biaya pengelolaan gudang dari jarak jauh. Mengapa mengambil risiko sewa gudang jangka panjang dan seluruh jika Anda dapat menyewa sesuai kebutuhan untuk menguji pasar?",
+    //         "home-niched": "Kemampuan gudang khusus",
+    //         "home-building": "Membangun fasilitas gudang khusus bisa mahal. Kami akan mengelola inventaris Anda tanpa investasi modal.",
+    //         "home-canyou": "Bisakah Anda mengirimkan produk ke pelanggan dengan CEPAT?",
+    //         "home-weare": "Kami adalah pasar gudang berdasarkan permintaan yang menghubungkan penawaran dan permintaan ruang gudang. Kami mendekatkan produk Anda ke pelanggan. Buat jaringan gudang berkualitas yang memberi Anda keunggulan kompetitif pada waktu pengiriman.",
+    //         "home-quality": "Kualitas Gudang",
+    //         "home-allwarehouse": "Semua gudang harus memenuhi persyaratan kami dan mempertahankan peringkat minimum untuk terus terdaftar di Warespaze",
+    //         "home-labourhassle": "Labour-Hassle Free",
+    //         "home-managingyour": "Mengelola gudang Anda sendiri memakan waktu dan mengalihkan perhatian Anda dari penjualan. Kami akan mengelola gudang sehingga Anda dapat fokus pada apa yang penting: PENJUALAN!",
+    //         "home-transparency": "Transparansi",
+    //         "home-itseasy": "Sangat mudah untuk kehilangan jejak ketika Anda menjalankan bisnis Anda. Di sini, di Warespaze, kami melacak semuanya secara real-time. Informasi siap di ujung jari Anda!",
+    //         "about-about": "Tentang Warespaze",
+    //         "about-warespazeis": "Warespaze adalah kenyamanan rantai pasokan Anda!",
+    //         "about-focused": "Berfokus di Indonesia, kami adalah pasar gudang sesuai permintaan yang menghubungkan antara penawaran dan permintaan ruang gudang. Warespaze menjembatani kebutuhan pedagang dan pemilik gudang melalui pasar dan sistem manajemen gudang yang mudah digunakan.",
+    //         "about-weget": "Kami mendekatkan produk Anda ke pelanggan. Bersama kami, Anda dapat menciptakan jaringan gudang berkualitas yang memberi Anda keunggulan kompetitif dalam waktu pengiriman.",
+    //         "search-warehouse" : "Gudang ditemukan di",
+    //         "search-type" : "Tipe Gudang",
+    //         "search-facility" : "Fasilitas Gudang",
+    //         "search-sort" : "Urutkan",
+    //         "search-other" : "Gudang lain yang mungkin menarik",
+    //         "detail-desc": "Deskripsi",
+	// 		"detail-facility": "Fasilitas",
+	// 		"detail-operation": "Waktu Operasi",
+	// 		"detail-noreviews": "Belum ada review untuk space ini. Jadilah yang pertama.",
+	// 		"detail-booking": "Booking",
+	// 		"detail-start": "Tanggal Mulai",
+	// 		"detail-end": "Tanggal Selesai",
+	// 		"detail-spacefee": "Space Fee",
+	// 		"detail-addonfee": "Add on Fee",
+	// 		"detail-hinfee": "Handling In Fee",
+	// 		"detail-houtfee": "Handling Out Fee",
+    //         "detail-tax": "Pajak",
+	// 		"detail-booknow": "Pesan Sekarang",
+    //         "partner-become": "Jadilah Partner Gudang Kami",
+    //         "partner-maximize": "Maksimalkan penghasilan dari gudang kosong Anda. Bergabung sekarang!",
+    //         "partner-register": "Daftar Gudang",
+    //         "partner-continue": "Lanjutkan",
+    //         "partner-back": "Kembali",
+    //         "partner-s1-create": "Buat Profile",
+    //         "partner-s1-firstname" : "Nama Depan",
+    //         "partner-s1-lastname" : "Nama Belakang",
+    //         "partner-s1-mobile" : "Mobile Phone",
+    //         "partner-s2-create": "Buat Profile Bisnis",
+    //         "partner-s2-companyname": "Nama Perusahaan",
+    //         "partner-s2-contactname": "Nama Kontak",
+    //         "partner-s2-npwp": "NPWP",
+    //         "partner-s2-address1": "Alamat 1",
+    //         "partner-s2-address2": "Alamat 2",
+    //         "partner-s2-province": "Provinsi",
+    //         "partner-s2-regency": "Kota",
+    //         "partner-s2-postal": "Kode Pos",
+    //         "partner-s3-create": "Buat Gudang",
+    //         "partner-s3-name": "Nama Gudang",
+    //         "partner-s3-facility": "Fasilitas Gudang",
+    //         "partner-s3-desc": "Deskripsi Gudang",
+    //         "partner-s3-size": "Ukuran Gudang",
+    //         "partner-s3-unit": "Satuan",
+    //         "partner-s3-add": "Tambah Gambar",
+    //         "partner-s3-use": "Gunakan alamat bisnis profile",
+    //         "partner-s3-address1": "Alamat 1",
+    //         "partner-s3-address2": "Alamat 2",
+    //         "partner-s3-province": "Provinsi",
+    //         "partner-s3-regency": "Kota",
+    //         "partner-s3-postal": "Kode Pos",
+    //         "partner-s3-maps": "Map Lokasi",
+    //         "partner-s3-notes": "Catatan Lokasi",
+    //         "partner-s4-create": "Buat Space Gudang",
+    //         "partner-s4-name": "Nama Space",
+    //         "partner-s4-type": "Tipe Space",
+    //         "partner-s4-size": "Ukuran(sqm)",
+    //         "partner-s4-category": "Kategory Space",
+    //         "partner-s4-minimum": "Minimal Booking",
+    //         "partner-s4-cancel": "Tipe Cencellation",
+    //         "booking-booking": "Detail Booking",
+    //         "booking-additional": "Layanan Tambahan",
+    //         "booking-bookingsummary": "Ringkasan Booking",
+    //         "booking-spacefee": "Space Fee",
+	// 		"booking-addonfee": "Add on Fee",
+	// 		"booking-hinfee": "Handling In Fee",
+	// 		"booking-houtfee": "Handling Out Fee",
+    //         "booking-tax": "Pajak",
+    //         "booking-continue": "Lanjutkan",
+	// 		"booking-back": "Kembali",
+    //         "booking-s1-your": "Detail Pesanan Anda",
+    //         "booking-s1-start": "Tanggal Mulai",
+    //         "booking-s1-end": "Tanggal Selesai",
+    //         "booking-s1-product": "Nama Produk",
+    //         "booking-s1-type": "Tipe Produk",
+    //         "booking-s1-quantity": "Kuantitas",
+    //         "booking-s1-weight": "Berat",
+    //         "booking-s1-weightnote": "Silakan masukkan berat per kuantitas",
+    //         "booking-s1-dimension": "Dimensi (panjang x lebar x tinggi)",
+    //         "booking-s1-dimensionnote": "Silakan masukkan dimensi per kuantitas",
+    //         "booking-s1-estimated": "Perkiraan Tanggal Pengiriman",
+    //         "booking-s1-hin": "Handing In",
+    //         "booking-s1-hout": "Handling Out",
+    //         "booking-s1-hinnote": "Perkiraan frekuensi handling in per durasi sewa",
+    //         "booking-s1-houtnote": "Perkiraan frekuensi handling out per durasi sewa",
+    //         "booking-s1-cancellation": "Kebijakan Pembatalan",
+    //         "booking-s1-warehouserental": "Perjanjian Sewa Gudang",
+    //         "booking-s1-pleasereview": "Harap tinjau dan terima perjanjian sewa",
+    //         "booking-s1-read": "Baca Perjanjian Sewa",
+    //         "booking-s1-close": "Tutup",
+    //         "booking-s1-accept": "Terima",
+    //         "booking-s2-add": "Tambahan",
+    //         "contact-contact": "Hubungi Kami",
+    //         "contact-have": "Ada pertanyaan? Silakan isi formulir di bawah ini",
+    //         "contact-yourname": "Nama Anda",
+    //         "contact-youremail": "Email Anda",
+    //         "contact-yourquestion": "Pertanyaan Anda",
+    //         "contact-send": "Kirim",
+    //     }
+    // };
+    //console.log("exampleLang",exampleLang)
+
+    
+    // $.getJSON( "assets/lang/default-lang.json", function( defaultLang ) {
+
+    //     if (lang === 'id') {
+    //         $('.myLang').each(function(index, item) {
+    //             $(this).text(exampleLang["id"][$(this).attr('key')]);
+    //             $(this).attr('placeholder', exampleLang["id"][$(this).attr('key')]);
+    //         });
+    //     } 
+        
+    //   });
+});
+
+function getLang() {
+    var lang = "en";
+	if(localStorage.hasOwnProperty("lang")) {
+		lang = localStorage.getItem("lang");
+	} else {
+        localStorage.setItem("lang", lang);
+    }
+
+    // language for pp and tou
+    if (lang === 'id') {
+        $('#pp-id').removeClass("d-none");
+        $('#pp-en').addClass("d-none");
+
+        $('#tou-id').removeClass("d-none");
+        $('#tou-en').addClass("d-none");
+    } else {
+        $('#pp-id').addClass("d-none");
+        $('#pp-en').removeClass("d-none");
+
+        $('#tou-id').addClass("d-none");
+        $('#tou-en').removeClass("d-none");
+    }
+    let ts = getTimeStamp();
+	$.ajax({
+		type: 'post',
+		url: URL + "getTranslation",
+		headers: {
+			apiKey: apiKey,
+		},
+        dataType: 'json',
+		data: {
+			language: lang,
+            timeStamp: getTimeStamp(),
+            apiToken: genToken(ts),
+            sender: 'app',
+		},
+		dataType: 'json',
+	}).then(function (data) {
+		if (data.responseCode === '000') {
+            $("#dropdownMenuButton").html(lang.toUpperCase());
+            $('.myLang').each(function(index, item) {
+                $(this).text(data.response[lang.toString()][$(this).attr('key')]);
+                $(this).attr('placeholder', data.response[lang.toString()][$(this).attr('key')]);
+            });
+		}
+	});
+}
+
+function selectLang(lang) {
+    localStorage.setItem("lang", lang);
+    getLang();
+}

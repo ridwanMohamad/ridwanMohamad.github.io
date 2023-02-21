@@ -1,0 +1,324 @@
+/**
+ * @returns {String} string random id
+ */
+function genMyId() {
+	return (
+		Math.random().toString(36).substring(2, 15) +
+		Math.random().toString(36).substring(2, 15)
+	);
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger Show sweetalert2 alert then reload after pressed OK.
+ * @param {String} icon alert icon (success, warning, error)
+ * @param {String} title alert title
+ * @param {String} text alert text
+ * @param {String} footer [optional] footer class
+ */
+function showAlertReload(icon, title, text, footer = '') {
+	Swal.fire({
+		icon: icon,
+		title: title,
+		text: text,
+		footer: footer,
+	}).then(function () {
+		location.reload();
+	});
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger Show sweetalert2 alert with HTML then reload after pressed OK.
+ * @param {String} icon alert icon (success, warning, error)
+ * @param {String} title alert title
+ * @param {String} html html body alert
+ * @param {String} footer [optional] footer class
+ */
+function showAlertHTMLReload(icon, title, html, footer = '') {
+	Swal.fire({
+		icon: icon,
+		title: title,
+		html: html,
+		footer: footer,
+	}).then(function () {
+		location.reload(true);
+	});
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger Show sweetalert2 alert with HTML then reload after pressed OK.
+ * @param {String} icon alert icon (success, warning, error)
+ * @param {String} title alert title
+ * @param {String} html html body alert
+ * @param {String} target target URL ex. www.gooogle.com
+ * @param {String} footer [optional] footer class
+ */
+function showAlertHTMLRedirect(icon, title, html, target, footer = '') {
+	Swal.fire({
+		icon: icon,
+		title: title,
+		html: html,
+		footer: footer,
+	}).then(function () {
+		window.location.replace(target);
+	});
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger Show sweetalert2 alert
+ * @param {String} icon alert icon (success, warning, error)
+ * @param {String} title alert title
+ * @param {String} text alert text
+ * @param {String} footer [optional] footer class
+ */
+function showAlert(icon, title, text, footer = '') {
+	Swal.fire({
+		icon: icon,
+		title: title,
+		text: text,
+		footer: footer,
+	});
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger Show sweetalert2 alert with HTML
+ * @param {String} icon alert icon (success, warning, error)
+ * @param {String} title alert title
+ * @param {String} html html body alert
+ * @param {String} footer [optional] footer class
+ */
+function showAlertHTML(icon, title, html, footer = '') {
+	Swal.fire({
+		icon: icon,
+		title: title,
+		html: html,
+		footer: footer,
+	});
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * Trigger block UI with image set from app/Config/App.php
+ */
+function blockLoad() {
+	$('#divBlockLoading').show();
+}
+
+/**
+ * <b>Explanation:</b><br/><br/>
+ * hide UI blocker
+ */
+function unblockLoad() {
+	$('#divBlockLoading').hide();
+}
+
+/**
+ * <b>Example Usage:</b><br/><br/>
+ * var checkEmail = validateEmail("developer@mad.co.id");
+ * @param {String} email email to check
+ * @returns {Boolean}
+ */
+function validateEmail(email) {
+	var re =
+		/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+	return re.test(email);
+}
+
+/**
+ * <b>Example Usage:</b><br/><br/>
+ * add this on input html onkeypress="return isNumberKey(event)"<br/><br/>
+ * <b>Explanation:</b><br/><br/>
+ * Used make sure html input only return numeric character
+ * @param {event} evt
+ * @returns {Boolean}
+ */
+function isNumberKey(evt) {
+	var charCode = evt.which ? evt.which : event.keyCode;
+	if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+	return true;
+}
+
+/**
+ * <b>Example Usage:</b><br/><br/>
+ * add this on input html onkeypress="return isAlfa(event)"<br/><br/>
+ * <b>Explanation:</b><br/><br/>
+ * Used make sure html input only return alphabet character
+ * @param {event} evt
+ * @returns {Boolean}
+ */
+function isAlfa(evt) {
+	evt = evt ? evt : window.event;
+	var charCode = evt.which ? evt.which : evt.keyCode;
+	if (
+		charCode > 31 &&
+		(charCode < 65 || charCode > 90) &&
+		(charCode < 97 || charCode > 122)
+	) {
+		return false;
+	}
+	return true;
+}
+
+function checkFileSize(input, maxFileSize) {
+	var fileSize = 0;
+	if (input.files && input.files[0]) {
+		console.log('maxFileSize: ' + maxFileSize);
+
+		fileSize = input.files[0].size;
+		if (fileSize <= maxFileSize) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function readURL(input, targetViewId) {
+	if (input.files && input.files[0]) {
+		var reader = new FileReader();
+
+		reader.onload = function (e) {
+			$('#' + targetViewId).attr('src', e.target.result);
+		};
+
+		reader.readAsDataURL(input.files[0]);
+	}
+}
+
+function renewIndex(elOutput) {
+	var parent = $(elOutput).parent();
+	var elem = $(elOutput);
+
+	$(elem, parent).each(function (i) {
+		$(this).text(i + 1);
+	});
+}
+
+function sha256(ascii) {
+	function rightRotate(value, amount) {
+		return (value >>> amount) | (value << (32 - amount));
+	}
+
+	var mathPow = Math.pow;
+	var maxWord = mathPow(2, 32);
+	var lengthProperty = 'length';
+	var i, j; // Used as a counter across the whole file
+	var result = '';
+
+	var words = [];
+	var asciiBitLength = ascii[lengthProperty] * 8;
+
+	//* caching results is optional - remove/add slash from front of this line to toggle
+	// Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
+	// (we actually calculate the first 64, but extra values are just ignored)
+	var hash = (sha256.h = sha256.h || []);
+	// Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
+	var k = (sha256.k = sha256.k || []);
+	var primeCounter = k[lengthProperty];
+	/*/
+	var hash = [], k = [];
+	var primeCounter = 0;
+	//*/
+
+	var isComposite = {};
+	for (var candidate = 2; primeCounter < 64; candidate++) {
+		if (!isComposite[candidate]) {
+			for (i = 0; i < 313; i += candidate) {
+				isComposite[i] = candidate;
+			}
+			hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+			k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+		}
+	}
+
+	ascii += '\x80'; // Append Ƈ' bit (plus zero padding)
+	while ((ascii[lengthProperty] % 64) - 56) ascii += '\x00'; // More zero padding
+	for (i = 0; i < ascii[lengthProperty]; i++) {
+		j = ascii.charCodeAt(i);
+		if (j >> 8) return; // ASCII check: only accept characters in range 0-255
+		words[i >> 2] |= j << (((3 - i) % 4) * 8);
+	}
+	words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+	words[words[lengthProperty]] = asciiBitLength;
+
+	// process each chunk
+	for (j = 0; j < words[lengthProperty]; ) {
+		var w = words.slice(j, (j += 16)); // The message is expanded into 64 words as part of the iteration
+		var oldHash = hash;
+		// This is now the undefinedworking hash", often labelled as variables a...g
+		// (we have to truncate as well, otherwise extra entries at the end accumulate
+		hash = hash.slice(0, 8);
+
+		for (i = 0; i < 64; i++) {
+			var i2 = i + j;
+			// Expand the message into 64 words
+			// Used below if
+			var w15 = w[i - 15],
+				w2 = w[i - 2];
+
+			// Iterate
+			var a = hash[0],
+				e = hash[4];
+			var temp1 =
+				hash[7] +
+				(rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) + // S1
+				((e & hash[5]) ^ (~e & hash[6])) + // ch
+				k[i] +
+				// Expand the message schedule if needed
+				(w[i] =
+					i < 16
+						? w[i]
+						: (w[i - 16] +
+								(rightRotate(w15, 7) ^
+									rightRotate(w15, 18) ^
+									(w15 >>> 3)) + // s0
+								w[i - 7] +
+								(rightRotate(w2, 17) ^
+									rightRotate(w2, 19) ^
+									(w2 >>> 10))) | // s1
+						  0);
+			// This is only used once, so *could* be moved below, but it only saves 4 bytes and makes things unreadble
+			var temp2 =
+				(rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) + // S0
+				((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2])); // maj
+
+			hash = [(temp1 + temp2) | 0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
+			hash[4] = (hash[4] + temp1) | 0;
+		}
+
+		for (i = 0; i < 8; i++) {
+			hash[i] = (hash[i] + oldHash[i]) | 0;
+		}
+	}
+
+	for (i = 0; i < 8; i++) {
+		for (j = 3; j + 1; j--) {
+			var b = (hash[i] >> (j * 8)) & 255;
+			result += (b < 16 ? 0 : '') + b.toString(16);
+		}
+	}
+	return result;
+}
+
+function ucwords(str) {
+	str = str.toLowerCase();
+
+	return (str + '').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+		return $1.toUpperCase();
+	});
+}
+
+function parseQS(url) {
+	// var url = document.location.href;
+	var qs = url.substring(url.indexOf('?') + 1).split('&');
+	for (var i = 0, result = {}; i < qs.length; i++) {
+		qs[i] = qs[i].split('=');
+		result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+	}
+	return result;
+}

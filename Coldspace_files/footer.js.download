@@ -1,0 +1,44 @@
+var lang = "en";
+lang = localStorage.getItem("lang");
+
+$('#btnNews').click(function (e) {
+	e.preventDefault();
+	if (validateEmail($('#newsletter').val())) {
+		let m = $('#newsletter').val();
+
+		$.ajax({
+			type: 'post',
+			url: URL + addEmailSubscription,
+			headers: {
+				apiKey: apiKey,
+			},
+			data: genReq('addEmailSubscription', {
+				m,
+			}),
+			dataType: 'json',
+		}).then(function (data) {
+			if (data.responseCode === '000') {
+				if (lang == 'id') {
+					showAlert('success', 'Terima kasih', '');
+				} else {
+					showAlert('success', 'Thank You', '');
+				}
+				$('#newsletter').val('');
+			} else {
+				if (lang == 'id') {
+					showAlert(
+						'error',
+						'Fail',
+						'Ups, sepertinya kami kesulitan menambahkan Anda ke buletin kami. Silakan coba lagi nanti'
+					);
+				} else {
+					showAlert(
+						'error',
+						'Fail',
+						'Oops looks like we have difficulties adding you to our newsletter. Please try again later'
+					);
+				}
+			}
+		});
+	}
+});

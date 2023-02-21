@@ -1,0 +1,321 @@
+const wms_url = $("meta[name='wms_url']").attr("content");
+const api_url = $("meta[name='api_url']").attr("content");
+const google_recaptcha_key = $("meta[name='google-recaptcha-key']").attr("content");
+const apiKey  = 'LL0lopWxFbBMAjUw92fN2KNCXfEC8xvG';
+const WMS_URL = wms_url;
+const URL     = api_url;
+
+const getProvinceList = 'getProvinceList';
+const getRegencyList = 'getRegencyList';
+const getSliderList = 'getSliderWarehouseList';
+const getWarehouseType = 'getTypeItemList';
+const getCategorySpaceList = 'getCategorySpaceList';
+const getMinBook = '';
+const getCancelType = 'getCancellationTypeList';
+const getProvinceSearch = 'searchProviceRegency';
+const getFacilites = 'getFacilityList';
+const getSearchLocation = 'searchProviceRegency';
+const getWarehouseDetail = 'getWarehouseDetail';
+const getSpaceDuration = 'getWarehouseSpaceDetail';
+const getCancellationTypeList = 'getCancellationTypeList';
+const getAllMeasurementUnitList = 'getAllMeasurementUnitList';
+const getTypeItemList = 'getTypeItemList';
+const getWarehouseSpaceDetail = 'getWarehouseSpaceDetail';
+const getWarehouseAdditionalServiceListPerType =
+	'getWarehouseAdditionalServiceListPerType';
+const getSpaceTypeList = 'getTypeItemList';
+const partnerRegister = 'partnerRegister';
+const merchantLogin = 'merchantLogin';
+const merchantSocialLogin = 'merchantSocialMediaLogin';
+const merchantUpdateProfile = 'merchantUpdateProfile';
+const merchantRegister = 'merchantRegister';
+const merchantForgotPassword = 'merchantForgotPassword';
+const calculatePrice = 'calculatePrice';
+const addBooking = 'addBooking';
+const addEmailSubscription = 'addEmailSubscription';
+const sendEmail = 'sendEmail';
+const activateMerchant = 'activateMerchant';
+const getPriceTypeUrl = 'getPriceType';
+
+const sl = 'rZQ2raaaa3tZK68h';
+var lang = "en";
+if(localStorage.hasOwnProperty("lang")) {
+	lang = localStorage.getItem("lang");
+}
+function pad(num) {
+	return num.toString().padStart(2, '0');
+}
+
+function getTimeStamp() {
+	var now = new Date();
+
+	return (
+		[now.getFullYear(), pad(now.getMonth() + 1), pad(now.getDate())].join(
+			'-'
+		) +
+		' ' +
+		[
+			pad(now.getHours()),
+			pad(now.getMinutes()),
+			pad(now.getSeconds()),
+		].join(':')
+	);
+}
+
+function genToken(ts) {
+	// apiToken = uppercase dari sha256 timeStamp + salt
+	return sha256(ts + '' + sl).toUpperCase();
+}
+
+function genReq(request, val) {
+	var res = '';
+	var ts = getTimeStamp();
+	let searchKey = '';
+	var lang = "en";
+	if(localStorage.hasOwnProperty("lang")) {
+		lang = localStorage.getItem("lang");
+	}
+	switch (request) {
+		case 'getSlider':
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getProvinceList':
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getCategorySpaceList':
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getSpaceTypeList':
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getRegencyList':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				provinceId: searchKey,
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getFacilityList':
+			res = {
+				language: lang,
+				timeStamp: ts,
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getWarehouseType':
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				warehouseId: '',
+				facilityId: '',
+				order: '',
+				full: '0',
+			};
+			break;
+		case 'getSearchLocation':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				searchKey: searchKey,
+			};
+			break;
+		case 'getWarehouseDetail':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: searchKey,
+				full: '0',
+			};
+			break;
+		case 'getSpaceDuration':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: searchKey,
+				full: '0',
+			};
+			break;
+		case 'getCancellationTypeList':
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getAllMeasurementUnitList':
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+			};
+			break;
+		case 'getPriceType':
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+			};
+			break;
+		case 'getTypeItemList':
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				order: 'name',
+				full: '0',
+			};
+			break;
+		case 'getWarehouseSpaceDetail':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: searchKey,
+				full: '0',
+			};
+			break;
+		case 'getWarehouseAdditionalServiceListPerType':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				id: '',
+				warehouseId: searchKey,
+				order: 'service',
+				full: '0',
+			};
+			break;
+		case 'addEmailSubscription':
+			searchKey = '';
+			$.each(val, function (index, value) {
+				searchKey = value;
+			});
+
+			res = {
+				language: lang,
+				timeStamp: getTimeStamp(),
+				apiToken: genToken(ts),
+				sender: 'app',
+				email: searchKey,
+			};
+			break;
+		default:
+			break;
+	}
+
+	return res;
+}
+
+function getWhType(obj) {
+	$.ajax({
+		type: 'post',
+		url: URL + getTypeItemList,
+		headers: {
+			apiKey: apiKey,
+		},
+		data: genReq('getTypeItemList', {}),
+		dataType: 'json',
+	}).then(function (data) {
+		if (data.responseCode === '000') {
+			let wh = data.response;
+			obj.empty();
+			if(lang == 'id') {
+				obj.append(new Option('Semua', '0'));
+			} else {
+				obj.append(new Option('All', '0'));
+			}
+
+			$.each(wh, function (i, v) {
+				obj.append(new Option(v.name, v.id));
+			});
+		}
+	});
+}

@@ -1,0 +1,204 @@
+var owl;
+var lang = 'en';
+lang = localStorage.getItem('lang');
+
+$(function () {
+	lili = [];
+	$('#reservationdate').bootstrapMaterialDatePicker({
+		time: false,
+		format: 'YYYY-MM-DD',
+		minDate: new Date(),
+	});
+
+	$('#filter').select2({
+		theme: 'bootstrap',
+		width: 'resolve',
+		closeOnSelect: true,
+	});
+
+	// $('#location').select2({
+	// 	theme: 'bootstrap',
+	// 	width: 'resolve',
+	// 	closeOnSelect: true,
+	// });
+
+	var searchLocationFromAPI = function () {
+		return function findMatches(q, cb) {
+			$.ajax({
+				type: 'post',
+				url: URL + getSearchLocation,
+				headers: {
+					apiKey: apiKey,
+				},
+				data: genReq('getSearchLocation', [q]),
+				dataType: 'json',
+				success: function (response) {
+					if (response.responseCode === '000') {
+						var res = [];
+						$.each(response.response, function (index, val) {
+							var temp = {};
+							temp['id'] = val.provinceId + '|' + val.regencyId;
+							temp['name'] = val.name;
+
+							res.push(temp);
+						});
+						lili = res;
+					}
+				},
+			});
+			cb(lili);
+		};
+	};
+
+	$('#sel-loc .typeahead').typeahead(
+		{ minLength: 3, higlight: true, hint: false },
+		{
+			name: 'my-data',
+			display: 'name',
+			limit: 50,
+			source: searchLocationFromAPI(),
+		}
+	);
+
+	$('#sel-loc .typeahead').on('typeahead:selected', function (e, datum) {
+		let tmp = datum.id;
+		if (tmp.length > 0) {
+			let tmpAr = tmp.split('|');
+
+			$('#pid').val(tmpAr[0]);
+			$('#rid').val(tmpAr[1]);
+		}
+	});
+
+	getSlider();
+	getWhType($('#filter'));
+});
+
+function getSlider() {
+	$.ajax({
+		type: 'post',
+		url: URL + getSliderList,
+		headers: {
+			apiKey: apiKey,
+		},
+		data: genReq('getSlider', {}),
+		dataType: 'json',
+		success: function (response) {
+			if (response.responseCode === '000') {
+				let items = response.response;
+				if (items.length > 0) {
+					generateSliderItem(items);
+				}
+			}
+		},
+		error: function (data) {
+			console.log('Error: ' + data);
+		},
+	});
+}
+
+function generateSliderItem(sliderData) {
+	if (sliderData.length > 0) {
+		var sliders = '';
+
+		$.each(sliderData, function (index, value) {
+			sliders +=
+				'<a href="warehouse/' +
+				value.id +
+				'" class="text-reset text-decoration-none"><div class="card rounded-warez" style="height: 310px !important; width: 350px !important;" >';
+			sliders +=
+				'<div class="imgTag">' +
+				value.pricePerDayDisplay +
+				' / day / storage</div><img class="card-img-top lazyOwl rounded-warez-top img-fluid" src="' +
+				value.imageLink +
+				'" alt="coldspace.id" style="height: 240px !important;"/>';
+			// '<img class="card-img-top rounded-warez-top img-fluid d-block rounded-top" src="' +
+			// 	value.imageLink +
+			// 	'" alt="Warespaze" style="height: 170px !important;"/>';
+			sliders +=
+				'<div class="card-body"><h4 class="card-title text-bold text-gray-dark">' +
+				value.name;
+			if (value.regencyName != '') {
+				sliders += ' - ' + ucwords(value.regencyName);
+			}
+			if (value.totalReview != '0') {
+				sliders +=
+					'</h4><br/><div><span class="fa fa-star checked"></span>' +
+					parseFloat(value.averageRating).toFixed(1) +
+					'</div>';
+			} else {
+				sliders += '</h4>';
+			}
+			sliders += '</div>';
+			sliders += '</div></a>';
+		});
+
+		$(sliders).appendTo('#myOwlCarousel');
+
+		owl = $('#myOwlCarousel').owlCarousel({
+			margin: 100,
+			autoplay: 3000,
+			loop: true,
+			pagination: false,
+			nav: true,
+			// mergeFit: true,
+			navText: [
+				'<span class="fa-stack"><i class="fa-solid fa-circle fa-stack-2x"></i><i class="fas fa-circle-chevron-left fa-2x coldspace-secondary"></i></span>',
+				'<span class="fa-stack"><i class="fa-solid fa-circle fa-stack-2x"></i><i class="fas fa-circle-chevron-right fa-2x coldspace-secondary"></i></span>',
+			],
+			responsiveClass: true,
+			responsive: {
+				0: {
+					autoplay: false,
+					items: 1,
+					center: true,
+					dots: false,
+					autoWidth: true,
+					margin: 10,
+				},
+				768: {
+					autoplay: 3000,
+					items: 4,
+					stagePadding: 40,
+					autoWidth: true,
+					margin: 10,
+					dots: false,
+				},
+			},
+		});
+	}
+}
+
+$('#btnPrev').click(function (e) {
+	e.preventDefault();
+	owl.trigger('prev.owl.carousel', [300]);
+});
+
+$('#btnNext').click(function (e) {
+	e.preventDefault();
+	owl.trigger('next.owl.carousel');
+});
+
+function checkSearch() {
+	console.log('here');
+	if (
+		$('#rid').val() != '' ||
+		($('#pid').val() != '' && $('#reservationdate').val() != '')
+	) {
+		// var form = document.getElementById('srch');
+		// form.submit();
+
+		// try redirect instead
+		window.location.href =
+			'/search?rid=' +
+			$('#rid').val() +
+			'&pid=' +
+			$('#pid').val() +
+			'&filter=' +
+			$('#filter').val() +
+			'&reservationdate=' +
+			$('#reservationdate').val() +
+			'&reservationdateend=' +
+			$('#reservationdate').val();
+	}
+}
